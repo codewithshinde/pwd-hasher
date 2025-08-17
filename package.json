@@ -1,18 +1,26 @@
 {
   "name": "pwd-hasher",
   "version": "1.0.0",
-  "main": "./dist/index.js",      
-  "module": "./dist/index.mjs",     
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts"
   },
   "author": "codewithshinde",
   "license": "ISC",
-  "description": "",
+  "description": "pwd-hasher is a simple, zero-dependency Node.js utility for hashing, verifying, and generating strong passwords using the built-in crypto module. It uses the modern and secure scrypt key derivation function.",
   "dependencies": {
     "tslib": "^2.3.0",
     "util": "^0.12.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codewithshinde/pwd-hasher.git"
+  },
+  "homepage": "https://github.com/codewithshinde/pwd-hasher#readme",
+  "bugs": {
+    "url": "https://github.com/codewithshinde/pwd-hasher/issues"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
