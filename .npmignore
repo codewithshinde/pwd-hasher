@@ -1,0 +1,9 @@
+# Source files (we only ship the compiled dist)
+src/
+
+# Config files
+tsconfig.json
+.gitignore
+
+# Dependencies
+node_modules/

@@ -1,0 +1,22 @@
+{
+  "name": "pwd-hasher",
+  "version": "1.0.0",
+  "main": "./dist/index.js",      
+  "module": "./dist/index.mjs",     
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts"
+  },
+  "author": "codewithshinde",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "util": "^0.12.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsup": "^6.1.2",
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,170 @@
+# PWD Hasher
+
+`pwd-hasher` is a simple, zero-dependency Node.js utility for hashing, verifying, and generating strong passwords using the built-in `crypto` module. It uses the modern and secure `scrypt` key derivation function.
+
+[](https://www.google.com/search?q=https://www.npmjs.com/package/pwd-hasher)
+[](https://www.google.com/search?q=https://www.npmjs.com/package/pwd-hasher)
+[](https://opensource.org/licenses/ISC)
+
+-----
+
+## \#\# Installation
+
+You can install the package using npm or yarn:
+
+```bash
+npm install pwd-hasher
+```
+
+or
+
+```bash
+yarn add pwd-hasher
+```
+
+-----
+
+## \#\# Core Concept: Why Hashing is Essential 🔒
+
+You should **never store passwords in plain text**. If your database is ever compromised, attackers would gain access to every user's account information.
+
+Password hashing is a **one-way process** that turns a password into a fixed-length string of characters, called a hash. This process is not reversible, meaning you cannot "un-hash" a password to get back to the original text. The only way to verify a password is to hash it again using the same "salt" (a random string) and see if the resulting hashes match.
+
+This package handles the entire process for you.
+
+-----
+
+## \#\# Real-World Usage: Authentication Workflow
+
+Here’s how you would use `pwd-hasher` in a typical web application for user sign-up, login, and password updates.
+
+### \#\#\# 1. User Registration (Sign-Up)
+
+When a new user creates an account, you must hash their password before saving it to your database.
+
+```typescript
+import { getHashedPassword } from 'pwd-hasher';
+
+async function handleUserSignUp(email, password) {
+  try {
+    // 1. Hash the user's chosen password.
+    const hashedPassword = await getHashedPassword(password);
+    
+    // Example hash: '16#a4e8b3f2c1d0.c8e7a6b4d2f0a1b9c3e8d7f6a5b4c3d2'
+
+    // 2. Save the user's email and the *hashedPassword* to your database.
+    // DO NOT save the original password.
+    await db.collection('users').insertOne({
+      email: email,
+      passwordHash: hashedPassword // Store the hash, not the password
+    });
+
+    console.log('User registered successfully!');
+  } catch (error) {
+    console.error('Error during registration:', error);
+  }
+}
+
+// Simulate a new user signing up
+handleUserSignUp('test@example.com', 'mySecurePassword123');
+```
+
+### \#\#\# 2. User Login
+
+When a user tries to log in, you retrieve their stored hash from the database and use `verifyHash` to securely compare it with the password they just entered.
+
+```typescript
+import { verifyHash } from 'pwd-hasher';
+
+async function handleUserLogin(email, passwordFromLoginForm) {
+  try {
+    // 1. Find the user in the database by their email.
+    const user = await db.collection('users').findOne({ email: email });
+
+    if (!user) {
+      console.log('Login failed: User not found.');
+      return;
+    }
+
+    // 2. Compare the password from the login form with the stored hash.
+    const isPasswordCorrect = await verifyHash(
+      passwordFromLoginForm,
+      user.passwordHash
+    );
+
+    if (isPasswordCorrect) {
+      console.log('✅ Password is correct. Logging in...');
+      // Proceed with creating a session, JWT, etc.
+    } else {
+      console.log('❌ Invalid credentials.');
+    }
+  } catch (error) {
+    console.error('An error occurred during login:', error);
+  }
+}
+
+// Simulate a login attempt
+handleUserLogin('test@example.com', 'mySecurePassword123');
+```
+
+### \#\#\# 3. Updating or Resetting a Password
+
+The process for updating a password is the same as registration: you hash the **new** password and replace the old hash in the database.
+
+```typescript
+import { getHashedPassword } from 'pwd-hasher';
+
+async function updateUserPassword(email, newPassword) {
+  try {
+    // 1. Hash the new password.
+    const newHashedPassword = await getHashedPassword(newPassword);
+
+    // 2. Find the user and update their passwordHash in the database.
+    await db.collection('users').updateOne(
+      { email: email },
+      { $set: { passwordHash: newHashedPassword } }
+    );
+
+    console.log('Password updated successfully!');
+  } catch (error) {
+    console.error('Error updating password:', error);
+  }
+}
+
+// Simulate a user changing their password
+updateUserPassword('test@example.com', 'myNewStrongerPassword456');
+```
+
+-----
+
+## \#\# API Reference
+
+### \#\#\# `getHashedPassword(password, [salt], [len])`
+
+Hashes a password with a salt using `scrypt`.
+
+  * **`password: string`**: The plaintext password to hash.
+  * **`salt?: string`** (optional): A salt to use. If not provided, a random one is generated.
+  * **`len?: number`** (optional): The length of the derived key. Defaults to `16`.
+  * **Returns**: `Promise<string>` - The final hash in the format `len#salt.hash`.
+
+### \#\#\# `verifyHash(password, hashPassword)`
+
+Verifies a plaintext password against a hash generated by this package.
+
+  * **`password: string`**: The plaintext password to check.
+  * **`hashPassword: string`**: The stored hash string (e.g., from your database).
+  * **Returns**: `Promise<boolean>` - `true` if the password matches, `false` otherwise.
+
+### \#\#\# `generateStrongPassword([length])`
+
+Generates a cryptographically-random password.
+
+  * **`length?: number`** (optional): The desired password length. Must be at least 8. Defaults to `12`.
+  * **Returns**: `string` - The generated strong password.
+
+-----
+
+## \#\# License
+
+This project is licensed under the **ISC License**.
